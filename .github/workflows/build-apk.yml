@@ -8,39 +8,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.10
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
 
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y build-essential git zip unzip ffmpeg \
-          libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
-          libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev \
-          zlib1g-dev libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good python3-pip
-        pip3 install cython==0.29.19 buildozer
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            build-essential \
+            git \
+            zip \
+            unzip \
+            ffmpeg \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixer-dev \
+            libsdl2-ttf-dev \
+            libportmidi-dev \
+            libswscale-dev \
+            libavformat-dev \
+            libavcodec-dev \
+            zlib1g-dev \
+            libgstreamer1.0-0 \
+            gstreamer1.0-plugins-base \
+            gstreamer1.0-plugins-good \
+            python3-pip
+          pip3 install cython==0.29.19 buildozer
 
-    - name: Initialize Buildozer
-      run: |
-        echo "[DEFAULT]" > buildozer.spec
-        buildozer init
+      - name: Initialize Buildozer
+        run: |
+          buildozer init
 
-    - name: Configure .spec file
-      run: |
-        sed -i "s/^# package.domain = .*/package.domain = org.example/" buildozer.spec
-        sed -i "s/^source.include_exts =.*/source.include_exts = py,png,jpg,kv,atlas/" buildozer.spec
-        sed -i "s/^# android.permissions = INTERNET/android.permissions = INTERNET/" buildozer.spec
+      - name: Set up buildozer.spec
+        run: |
+          sed -i "s/^# package.domain = .*/package.domain = org.example/" buildozer.spec
+          sed -i "s/^source.include_exts =.*/source.include_exts = py,png,jpg,kv,atlas/" buildozer.spec
+          sed -i "s/^# android.permissions = INTERNET/android.permissions = INTERNET/" buildozer.spec
 
-    - name: Build APK
-      run: buildozer android debug
+      - name: Build APK
+        run: buildozer android debug
 
-    - name: Upload APK
-      uses: dawidd6/action-upload-artifact@v2
-      with:
-        name: quantum-finance-apk
-        path: bin/*.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: quantum-finance-apk
+          path: bin/*.apk
